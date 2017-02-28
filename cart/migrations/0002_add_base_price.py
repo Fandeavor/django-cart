@@ -15,7 +15,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='item',
             name='base_price',
-            field=models.DecimalField(max_digits=18, decimal_places=2,
-                                      verbose_name=_('base price')),
+            field=models.DecimalField(max_digits=18, decimal_places=2),
         ),
     ]

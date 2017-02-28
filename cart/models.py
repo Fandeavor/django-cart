@@ -27,6 +27,7 @@ class Item(models.Model):
     cart = models.ForeignKey(Cart, verbose_name=_('cart'))
     quantity = models.PositiveIntegerField(verbose_name=_('quantity'))
     unit_price = models.DecimalField(max_digits=18, decimal_places=2, verbose_name=_('unit price'))
+    base_price = models.DecimalField(max_digits=18, decimal_places=2, verbose_name=_('base price'))
     # product as generic relation
     content_type = models.ForeignKey(ContentType)
     object_id = models.PositiveIntegerField()
@@ -42,7 +43,7 @@ class Item(models.Model):
         return u'%d units of %s' % (self.quantity, self.product.__class__.__name__)
 
     def total_price(self):
-        return self.quantity * self.unit_price
+        return self.base_price + (self.quantity * self.unit_price)
     total_price = property(total_price)
 
     # product

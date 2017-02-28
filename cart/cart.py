@@ -25,13 +25,17 @@ class Cart:
         for item in self.cart.item_set.all():
             yield item
 
+    def checkout(self):
+        self.cart.checked_out = True
+        self.cart.save()
+
     def new(self, request):
         cart = models.Cart(creation_date=datetime.datetime.now())
         cart.save()
         request.session[CART_ID] = cart.id
         return cart
 
-    def add(self, product, unit_price, quantity=1):
+    def add(self, product, unit_price, quantity=1, base_price=0):
         try:
             item = models.Item.objects.get(
                 cart=self.cart,
@@ -41,11 +45,13 @@ class Cart:
             item = models.Item()
             item.cart = self.cart
             item.product = product
+            item.base_price = base_price
             item.unit_price = unit_price
             item.quantity = quantity
             item.save()
         else: #ItemAlreadyExists
             item.unit_price = unit_price
+            item.base_price = base_price
             item.quantity = item.quantity + int(quantity)
             item.save()
 
@@ -60,7 +66,7 @@ class Cart:
         else:
             item.delete()
 
-    def update(self, product, quantity, unit_price=None):
+    def update(self, product, quantity, unit_price=None, base_price=None):
         try:
             item = models.Item.objects.get(
                 cart=self.cart,
@@ -74,6 +80,9 @@ class Cart:
             else:
                 item.unit_price = unit_price
                 item.quantity = int(quantity)
+                if base_price is not None:
+                    item.base_price = base_price
+
                 item.save()
 
     def count(self):
